@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    # Projet .NET ? Remplace par ci-dotnet.yml@v1 (et supprime le bloc "with").
+    uses: ChawkiSLIMANI/slimani-factory/.github/workflows/ci-node.yml@v1
+    with:
+      node-version: "24"
+
+  notify:
+    needs: ci
+    if: always()
+    uses: ChawkiSLIMANI/slimani-factory/.github/workflows/notify-slack.yml@v1
+    with:
+      kind: events
+      text: "CI ${{ needs.ci.result }} — ${{ github.repository }} — ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+    secrets: inherit

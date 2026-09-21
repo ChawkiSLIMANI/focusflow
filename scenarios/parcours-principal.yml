@@ -1,0 +1,15 @@
+# Scénario de simulation (phase 3) : dérivé des critères d'acceptation d'une spec.
+id: parcours-principal
+story: US-000
+personas: [camille-pressee]
+point_de_depart: /
+objectif: "Décris ici ce que la personne veut accomplir, avec ses propres mots."
+succes:
+  - "Condition observable qui prouve que l'objectif est atteint"
+echec:
+  - "Erreur bloquante, abandon, écran sans issue"
+budget:
+  max_etapes: 12
+  max_minutes: 5
+runs: 3                 # les agents ne sont pas déterministes : on répète
+seuil_reussite: 0.9     # part minimale de runs réussis pour passer la porte

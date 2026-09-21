@@ -1,0 +1,18 @@
+name: Revue IA
+
+on:
+  pull_request:
+    types: [opened, synchronize, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: write
+  id-token: write
+
+jobs:
+  review:
+    # Les PR en brouillon ne déclenchent pas la revue (économie d'appels API) :
+    # elle part quand tu passes la PR en « Ready for review ».
+    if: github.event.pull_request.draft == false
+    uses: ChawkiSLIMANI/slimani-factory/.github/workflows/claude-review.yml@v1
+    secrets: inherit
