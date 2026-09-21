@@ -28,10 +28,7 @@ export default function ShareView() {
 
   useEffect(() => {
     const hash = window.location.hash.slice(1);
-    if (!hash) {
-      setReady(true);
-      return;
-    }
+    // An empty hash is handled by decodeSharePayload, which resolves to null.
     decodeSharePayload(hash).then((decoded) => {
       setPayload(decoded);
       setSteps(decoded?.steps ?? []);
