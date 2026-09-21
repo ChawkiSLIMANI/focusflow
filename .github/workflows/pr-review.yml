@@ -1,0 +1,39 @@
+name: Revue IA
+
+on:
+  pull_request:
+    types: [opened, synchronize, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: write
+  id-token: write
+
+jobs:
+  review:
+    # Les PR en brouillon ne déclenchent pas la revue : elle part au passage en « Ready for review ».
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            REPO: ${{ github.repository }}
+            PR NUMBER: ${{ github.event.pull_request.number }}
+
+            Tu es un relecteur indépendant. Relis cette PR par rapport à CLAUDE.md et,
+            s'il existe, à la spec correspondante dans specs/. Ne modifie aucun fichier.
+            Vérifie : critères d'acceptation couverts par des tests, changements hors
+            périmètre, sécurité, robustesse, maintenabilité.
+            Poste un commentaire de PR : un verdict (APPROUVÉ, MODIFICATIONS DEMANDÉES ou
+            BLOQUANT), puis les constats au format
+            « [bloquant|important|mineur] fichier:ligne — problème — correction suggérée ».
+            Sois précis et bref.
+          claude_args: |
+            --max-turns 8
+            --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"

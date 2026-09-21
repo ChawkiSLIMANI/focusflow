@@ -1,0 +1,10 @@
+# Persona pour la simulation d'usage (phase 3). À adapter à chaque produit.
+id: camille-pressee
+nom: Camille, utilisatrice pressée
+profil: 34 ans, utilise son téléphone en mobilité, peu de patience pour les explications.
+objectif_type: accomplir la tâche principale en un minimum d'étapes
+contraintes:
+  - lit très peu les textes d'aide
+  - abandonne après 2 erreurs consécutives
+  - connexion mobile parfois instable
+comportement: clique vite, saute les étapes optionnelles, revient en arrière si perdue

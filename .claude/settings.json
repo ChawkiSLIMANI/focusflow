@@ -1,0 +1,36 @@
+{
+  "extraKnownMarketplaces": {
+    "slimani-factory": {
+      "source": {
+        "source": "github",
+        "repo": "ChawkiSLIMANI/slimani-factory"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "factory@slimani-factory": true
+  },
+  "permissions": {
+    "allow": [
+      "Bash(git status)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git checkout -b:*)",
+      "Bash(npm ci)",
+      "Bash(npm test:*)",
+      "Bash(npm run:*)",
+      "Bash(gh issue view:*)",
+      "Bash(gh pr view:*)",
+      "Bash(gh pr create:*)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./secrets/**)",
+      "Bash(rm -rf:*)",
+      "Bash(git push --force:*)"
+    ]
+  }
+}
