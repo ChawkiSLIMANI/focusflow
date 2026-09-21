@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { decodeSharePayload } from "../_lib/sharePayload";
 import ProgressStrip from "../_components/ProgressStrip";
 
@@ -27,10 +28,7 @@ export default function ShareView() {
 
   useEffect(() => {
     const hash = window.location.hash.slice(1);
-    if (!hash) {
-      setReady(true);
-      return;
-    }
+    // An empty hash is handled by decodeSharePayload, which resolves to null.
     decodeSharePayload(hash).then((decoded) => {
       setPayload(decoded);
       setSteps(decoded?.steps ?? []);
@@ -51,12 +49,12 @@ export default function ShareView() {
           Ce lien est malformé ou a été modifié. Demande à l&apos;expéditeur de
           t&apos;en envoyer un nouveau.
         </p>
-        <a
+        <Link
           href="/"
           className="mt-8 font-sans text-[14px] font-medium text-accent border-b border-accent pb-0.5"
         >
           Ouvrir FocusFlow
-        </a>
+        </Link>
       </div>
     );
   }
@@ -103,12 +101,12 @@ export default function ShareView() {
 
   return (
     <div className="relative z-10 max-w-[640px] mx-auto px-6 pt-8 pb-24 max-[720px]:px-4 max-[720px]:pt-6">
-      <a
+      <Link
         href="/"
         className="block font-mono text-[11px] uppercase tracking-[0.18em] text-ink-faint mb-8 hover:text-ink-soft transition-colors duration-100"
       >
         FocusFlow
-      </a>
+      </Link>
 
       <p className="font-sans text-[13px] text-ink-soft mb-6">
         Quelqu&apos;un t&apos;a envoyé un coup de pouce via FocusFlow
@@ -244,12 +242,12 @@ export default function ShareView() {
 
       <div className="mt-12 flex flex-col items-center gap-3">
         <p className="font-mono text-[11px] text-ink-faint">Ce lien n&apos;expire pas.</p>
-        <a
+        <Link
           href="/"
           className="font-sans text-[13px] text-ink-soft border border-dashed border-rule rounded-full px-4 py-2 hover:border-ink-soft hover:text-ink transition-colors duration-100"
         >
           Décomposer ta propre tâche →
-        </a>
+        </Link>
         <div className="mt-4">
           {reported ? (
             <p className="font-mono text-[11px] text-ink-faint">Signalement envoyé, merci.</p>

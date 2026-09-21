@@ -21,7 +21,14 @@ function Pill({
 export default function FocusState({ count }: { count: number }) {
   const [now, setNow] = useState<Date | null>(null);
 
+  // TODO(#4): the clock must stay client-only — the server renders no time at
+  // all (now === null), and this first synchronous setNow is what shows it
+  // right after mount instead of 30s later. Reading the time during render
+  // would cause an SSR hydration mismatch. Planned refactor: useSyncExternalStore
+  // with a module-level cached date and a getServerSnapshot returning null,
+  // to be done once tests cover it.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setNow(new Date());
     const id = setInterval(() => setNow(new Date()), 30_000);
     return () => clearInterval(id);

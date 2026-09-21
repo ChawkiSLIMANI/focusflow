@@ -66,9 +66,15 @@ export default function FocusFlowApp() {
   const [hydrated, setHydrated] = useState(false);
 
   // Restore persisted state on mount
+  // TODO(#4): restoring from localStorage must stay post-mount — this client
+  // component is rendered on the server, so reading localStorage during render
+  // (lazy useState initializer) would cause an SSR hydration mismatch. Moving
+  // this restore/persist pair to useSyncExternalStore is the planned refactor,
+  // to be done once tests cover it.
   useEffect(() => {
     const saved = loadPersistedState();
     if (saved) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (saved.task) setTask(saved.task);
       if (saved.mood) setMood(saved.mood);
       if (Array.isArray(saved.steps)) setSteps(saved.steps);
