@@ -15,4 +15,5 @@ jobs:
     # elle part quand tu passes la PR en « Ready for review ».
     if: github.event.pull_request.draft == false
     uses: ChawkiSLIMANI/slimani-factory/.github/workflows/claude-review.yml@v1
-    secrets: inherit
+    secrets:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}

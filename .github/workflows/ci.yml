@@ -10,7 +10,6 @@ permissions:
 
 jobs:
   ci:
-    # Projet .NET ? Remplace par ci-dotnet.yml@v1 (et supprime le bloc "with").
     uses: ChawkiSLIMANI/slimani-factory/.github/workflows/ci-node.yml@v1
     with:
       node-version: "24"
@@ -22,4 +21,6 @@ jobs:
     with:
       kind: events
       text: "CI ${{ needs.ci.result }} — ${{ github.repository }} — ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-    secrets: inherit
+    secrets:
+      SLACK_WEBHOOK_EVENTS: ${{ secrets.SLACK_WEBHOOK_EVENTS }}
+      SLACK_WEBHOOK_DECISIONS: ${{ secrets.SLACK_WEBHOOK_DECISIONS }}
