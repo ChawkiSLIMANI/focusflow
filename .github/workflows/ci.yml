@@ -10,17 +10,21 @@ permissions:
 
 jobs:
   ci:
-    uses: ChawkiSLIMANI/slimani-factory/.github/workflows/ci-node.yml@v1
-    with:
-      node-version: "24"
-
-  notify:
-    needs: ci
-    if: always()
-    uses: ChawkiSLIMANI/slimani-factory/.github/workflows/notify-slack.yml@v1
-    with:
-      kind: events
-      text: "CI ${{ needs.ci.result }} — ${{ github.repository }} — ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-    secrets:
-      SLACK_WEBHOOK_EVENTS: ${{ secrets.SLACK_WEBHOOK_EVENTS }}
-      SLACK_WEBHOOK_DECISIONS: ${{ secrets.SLACK_WEBHOOK_DECISIONS }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci
+      - name: Lint
+        run: npm run lint
+      # Les étapes suivantes tournent même si le lint échoue, pour voir tout l'état du projet
+      - name: Tests
+        if: ${{ !cancelled() }}
+        run: npm test --if-present
+      - name: Build
+        if: ${{ !cancelled() }}
+        run: npm run build
