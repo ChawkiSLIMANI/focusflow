@@ -24,10 +24,8 @@ export default function CaptureDock({ thoughts, onAdd, onTransform }: Props) {
     return () => document.removeEventListener("keydown", onKey);
   }, []);
 
-  // Close drawer when thoughts become empty
-  useEffect(() => {
-    if (thoughts.length === 0) setOpen(false);
-  }, [thoughts.length]);
+  // Derived state: the drawer is never visible while the list is empty.
+  const isOpen = open && thoughts.length > 0;
 
   function fireConfetti() {
     if (!sendRef.current) return;
@@ -76,9 +74,9 @@ export default function CaptureDock({ thoughts, onAdd, onTransform }: Props) {
           ref={panelRef}
           className="overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
           style={{
-            maxHeight: open ? 320 : 0,
-            opacity: open ? 1 : 0,
-            marginBottom: open ? 8 : 0,
+            maxHeight: isOpen ? 320 : 0,
+            opacity: isOpen ? 1 : 0,
+            marginBottom: isOpen ? 8 : 0,
           }}
         >
           <div className="bg-paper-card border border-rule rounded-[18px] overflow-hidden shadow-soft">
@@ -157,14 +155,14 @@ export default function CaptureDock({ thoughts, onAdd, onTransform }: Props) {
             <button
               type="button"
               onClick={() => setOpen((v) => !v)}
-              aria-label={open ? "fermer les pensées" : "voir les pensées capturées"}
+              aria-label={isOpen ? "fermer les pensées" : "voir les pensées capturées"}
               className={`shrink-0 flex items-center gap-1 font-mono text-[10px] rounded-full px-2.5 py-1.5 transition-all duration-150 cursor-default whitespace-nowrap ${
-                open
+                isOpen
                   ? "bg-accent text-ink"
                   : "bg-[rgba(255,255,255,.12)] text-[rgba(242,237,227,.7)] hover:bg-[rgba(255,255,255,.2)]"
               }`}
             >
-              <span>{open ? "▼" : "▲"}</span>
+              <span>{isOpen ? "▼" : "▲"}</span>
               <span>{thoughts.length}</span>
             </button>
           )}
