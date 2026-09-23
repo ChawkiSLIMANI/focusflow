@@ -34,12 +34,16 @@ jobs:
 
             Tu es un relecteur indépendant. Ne modifie aucun fichier.
             Méthode économe :
-            1. Lis le diff une seule fois avec `gh pr diff`.
-            2. Dans la spec correspondante (specs/), lis seulement les critères
+            1. Liste les fichiers modifiés avec `gh pr diff --name-only`.
+            2. Lis le diff SANS les fichiers générés, en une seule commande :
+               `git diff origin/main...HEAD -- . ':(exclude)package-lock.json'`
+               Ne lis jamais package-lock.json.
+            3. Dans la spec correspondante (specs/), lis seulement les critères
                d'acceptation et le hors périmètre. CLAUDE.md est déjà dans ton contexte.
-            3. N'ouvre d'autres fichiers que si un constat l'exige.
-            4. Poste UN seul commentaire avec `gh pr comment`, au plus tard au 10e tour,
-               même si ta revue est incomplète (indique alors ce que tu n'as pas vérifié).
+            4. N'ouvre d'autres fichiers que si un constat l'exige.
+            5. Poste UN seul commentaire avec `gh pr comment`, même si ta revue est
+               incomplète (indique alors ce que tu n'as pas vérifié). Poster le
+               commentaire passe avant toute vérification supplémentaire.
             Vérifie : critères d'acceptation, changements hors périmètre, règles de
             CLAUDE.md, sécurité, robustesse, maintenabilité.
             Le commentaire contient un verdict (APPROUVÉ, MODIFICATIONS DEMANDÉES ou
@@ -47,6 +51,6 @@ jobs:
             « [bloquant|important|mineur] fichier:ligne — problème — correction suggérée ».
             Sois précis et bref.
           claude_args: |
-            --max-turns 12
+            --max-turns 15
             --model claude-sonnet-4-6
-            --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"
+            --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(git diff:*)"
