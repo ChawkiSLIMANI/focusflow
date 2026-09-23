@@ -121,8 +121,6 @@ describe("POST /api/breakdown — format d'étapes inattendu", () => {
   });
 
   it("renvoie 500 quand toutes les étapes ont un titre trop court", async () => {
-    // Literal example of the spec (C30): "ok" is 2 characters, "a" is 1, so
-    // every step is filtered out and the route answers 500, not 200.
     mockModelJson({
       steps: [
         { t: "ok", m: "2 min" },

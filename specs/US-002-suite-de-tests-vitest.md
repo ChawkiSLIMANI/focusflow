@@ -271,8 +271,13 @@ Scénario: C30 — Format d'étapes inattendu
   Alors la réponse a le statut 500 et le corps { error: "Format de réponse inattendu." }
   Étant donné un SDK simulé qui renvoie {"steps":[{"t":42,"m":"2 min"}]}
   Alors la réponse a le statut 500 et le même message
-  Étant donné un SDK simulé qui renvoie {"steps":[{"t":"ok","m":"2 min"},{"t":"a","m":"1 min"}]}
+  Étant donné un SDK simulé qui renvoie {"steps":[{"t":"Ouvrir le doc","m":"2 min"},{"t":"a","m":"1 min"}]}
   Alors la réponse a le statut 200 et ne contient que l'étape dont le titre fait au moins 3 caractères
+  Étant donné un SDK simulé qui renvoie {"steps":[{"t":"ok","m":"2 min"},{"t":"a","m":"1 min"}]}
+      dont aucune étape n'atteint 3 caractères
+  Alors la réponse a le statut 500 et le corps { error: "Format de réponse inattendu." }
+  Et c'est le comportement voulu : le filtre "t.length >= 3" (route.ts:199) élimine
+      les deux étapes, steps est vide, et la route refuse la réponse du modèle
 
 Scénario: C31 — Réponse sans bloc de texte
   Étant donné un SDK simulé dont le contenu ne comporte aucun bloc de type "text"
