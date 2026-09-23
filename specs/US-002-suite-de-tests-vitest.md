@@ -128,13 +128,27 @@ Scénario: C10 — Chaîne vide
   Alors le résultat est null
   Et aucune exception n'est levée
 
-Scénario: C11 — Limite de 2000 caractères
-  Étant donné une chaîne encodée de 2001 caractères
-  Quand j'appelle decodeSharePayload
+Scénario: C11 — Limite de 2000 caractères, vérifiée sur l'intention du garde-fou
+  Étant donné un espion posé sur le constructeur global DecompressionStream
+  Quand j'appelle decodeSharePayload avec une chaîne de 2004 caractères
   Alors le résultat est null
-  Et aucune exception n'est levée
-  Et le cas de la charge valide maximale refusée par cette même limite
-      n'est pas testé ici : il fait l'objet d'un it.todo citant l'issue #13 (cf. C38)
+  Et aucun DecompressionStream n'a été construit : le garde-fou de longueur
+      (sharePayload.ts:39) précède le bloc try, donc toute tentative de décompression
+  Quand j'appelle decodeSharePayload avec une chaîne de 2000 caractères
+  Alors un DecompressionStream a bien été construit — témoin prouvant que l'espion
+      est actif et aurait enregistré un appel au cas précédent
+  Et l'espion est restauré après le test (bloc finally)
+  Et aucune exception ne sort de la fonction
+
+  # Pourquoi l'espion : asserter « null » seul ne prouve rien, car une chaîne de
+  # remplissage échoue de toute façon à la décompression. Un test de mutation a
+  # montré qu'un plafond déplacé à 3000 passait inaperçu. L'espion pinne la limite.
+  # Pourquoi 2004 et non 2001 : fromUrlBase64 appelle atob sans restaurer le padding,
+  # donc une longueur non multiple de 4 lève AVANT d'atteindre le constructeur, ce qui
+  # rendrait le test à nouveau vert pour la mauvaise raison. 2004 est le premier
+  # multiple de 4 au-delà de la limite.
+  # Le cas de la charge valide maximale refusée par cette même limite reste hors de
+  # ce critère : il fait l'objet d'un it.todo citant l'issue #13 (cf. C38).
 
 Scénario: C12 — Entrée corrompue
   Quand j'appelle decodeSharePayload avec "!!!pas-du-base64!!!"

@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   decodeSharePayload,
   encodeSharePayload,
@@ -55,10 +55,32 @@ describe("decodeSharePayload — entrées limites et corrompues", () => {
     await expect(decodeSharePayload("")).resolves.toBeNull();
   });
 
-  it("renvoie null au-delà de 2000 caractères", async () => {
-    const tooLong = "a".repeat(2001);
-    expect(tooLong.length).toBe(2001);
-    await expect(decodeSharePayload(tooLong)).resolves.toBeNull();
+  it("renvoie null au-delà de 2000 caractères sans tenter de décompresser", async () => {
+    // The guard sits before the try block, so an over-long input must be rejected
+    // without ever reaching DecompressionStream. Spying on the constructor pins that
+    // intent: asserting null alone would also pass if the guard disappeared, because
+    // a filler string fails decompression anyway.
+    // While the spy is installed it replaces the real constructor, so decoding cannot
+    // succeed — only whether the constructor is reached is observed here.
+    // Length must stay a multiple of 4: fromUrlBase64 calls atob without restoring
+    // padding, so 2001 characters would throw there and never reach the constructor,
+    // which would make this test pass for the wrong reason again.
+    const spy = vi.spyOn(globalThis, "DecompressionStream");
+    try {
+      const tooLong = "a".repeat(2004);
+      expect(tooLong.length % 4).toBe(0);
+      await expect(decodeSharePayload(tooLong)).resolves.toBeNull();
+      expect(spy).not.toHaveBeenCalled();
+
+      // Control: at the cap the guard lets the input through, which proves the spy
+      // is live and would have registered a call above.
+      const atLimit = "a".repeat(2000);
+      expect(atLimit.length).toBe(2000);
+      await expect(decodeSharePayload(atLimit)).resolves.toBeNull();
+      expect(spy).toHaveBeenCalledTimes(1);
+    } finally {
+      spy.mockRestore();
+    }
   });
 
   it("renvoie null sur une chaîne qui n'est pas du base64", async () => {
