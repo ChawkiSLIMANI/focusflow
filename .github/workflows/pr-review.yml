@@ -2,7 +2,14 @@ name: Revue IA
 
 on:
   pull_request:
-    types: [opened, synchronize, ready_for_review]
+    # Une seule revue par PR : au passage en « Ready for review ».
+    # Pour relancer : repasser la PR en brouillon puis en « Ready for review ».
+    types: [ready_for_review, reopened]
+    # Pas de revue pour les PR qui ne touchent que de la documentation.
+    paths-ignore:
+      - "**/*.md"
+      - "personas/**"
+      - "scenarios/**"
 
 permissions:
   contents: read
@@ -11,7 +18,6 @@ permissions:
 
 jobs:
   review:
-    # Les PR en brouillon ne déclenchent pas la revue : elle part au passage en « Ready for review ».
     if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -29,17 +35,18 @@ jobs:
             Tu es un relecteur indépendant. Ne modifie aucun fichier.
             Méthode économe :
             1. Lis le diff une seule fois avec `gh pr diff`.
-            2. Lis CLAUDE.md et la spec correspondante dans specs/ si elle existe.
+            2. Dans la spec correspondante (specs/), lis seulement les critères
+               d'acceptation et le hors périmètre. CLAUDE.md est déjà dans ton contexte.
             3. N'ouvre d'autres fichiers que si un constat l'exige.
-            4. Poste UN seul commentaire avec `gh pr comment`, au plus tard au 15e tour,
+            4. Poste UN seul commentaire avec `gh pr comment`, au plus tard au 10e tour,
                même si ta revue est incomplète (indique alors ce que tu n'as pas vérifié).
-            Vérifie : critères d'acceptation de la spec, changements hors périmètre,
-            respect des règles de CLAUDE.md, sécurité, robustesse, maintenabilité.
+            Vérifie : critères d'acceptation, changements hors périmètre, règles de
+            CLAUDE.md, sécurité, robustesse, maintenabilité.
             Le commentaire contient un verdict (APPROUVÉ, MODIFICATIONS DEMANDÉES ou
             BLOQUANT), puis les constats au format
             « [bloquant|important|mineur] fichier:ligne — problème — correction suggérée ».
             Sois précis et bref.
           claude_args: |
-            --max-turns 20
+            --max-turns 12
             --model claude-sonnet-4-6
             --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"
