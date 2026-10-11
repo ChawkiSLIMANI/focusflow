@@ -42,3 +42,6 @@ next-env.d.ts
 
 # claude code (réglages personnels)
 .claude/settings.local.json
+
+# vs code
+*.code-workspace
