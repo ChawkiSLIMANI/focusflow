@@ -1,7 +1,7 @@
 ---
 id: US-1
 titre: Afficher la version de l'app dans le pied de page
-statut: draft        # draft | approved (l'humain seul valide)
+statut: approved        # draft | approved (l'humain seul valide)
 source: page Notion US-1 (base « User stories », Factory) — https://app.notion.com/p/835b8c2a33b544289f28a2078141ca39
 ---
 
