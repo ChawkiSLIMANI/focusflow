@@ -10,21 +10,23 @@ permissions:
 
 jobs:
   ci:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # historique complet : la porte compare la PR avec main
       - uses: actions/setup-node@v4
         with:
           node-version: "24"
           cache: npm
       - run: npm ci
-      - name: Lint
-        run: npm run lint
-      # Les étapes suivantes tournent même si le lint échoue, pour voir tout l'état du projet
-      - name: Tests
-        if: ${{ !cancelled() }}
-        run: npm test --if-present
+      # Porte qualité : spec et périmètre, secrets, hygiène des tests, lint, tests
+      - name: Porte qualité (scripts/verify.sh)
+        run: bash scripts/verify.sh
+        env:
+          BASE_REF: origin/${{ github.base_ref || 'main' }}
+      # Le build tourne même si la porte échoue, pour voir tout l'état du projet
       - name: Build
         if: ${{ !cancelled() }}
         run: npm run build

@@ -31,19 +31,20 @@ Next.js App Router, React, TypeScript, Tailwind CSS (animations en CSS : animate
 
 ## Commandes
 ```bash
+npm ci                # installation (commande npm, pas un script)
 # Scripts réellement présents dans package.json
-npm ci            # installation
-npm run lint      # analyse statique (eslint)
-npm run build     # build (next build)
-npm run dev       # serveur de développement
+npm run dev           # serveur de développement (next dev)
+npm run build         # build (next build)
+npm run start         # sert le build (next start)
+npm run lint          # analyse statique (eslint)
+npm test              # tests (vitest run)
+npm run test:watch    # tests en mode watch (vitest)
 ```
-- `npm run lint` échoue aujourd'hui avec 7 erreurs préexistantes, à corriger dans la première story :
-  4 × `react-hooks/set-state-in-effect` (CaptureDock.tsx, FocusFlowApp.tsx, FocusState.tsx, ShareView.tsx) ;
-  3 × `@next/next/no-html-link-for-pages` (ShareView.tsx).
-- Il n'existe pas encore de script `test`.
+- État vérifié le 2026-10-12 : `npm run lint` passe sans erreur ; `npx vitest run` passe
+  (8 fichiers de tests dont 1 sans test exécuté, 72 tests réussis, 6 `it.todo`, 0 échec).
 
 ## Conventions de code
-- Tout le code vit dans `app/` (App Router) : composants partagés dans `app/_components/`, utilitaires dans `app/_lib/`, route API dans `app/api/breakdown/route.ts`, page de partage dans `app/partage/`.
+- Code applicatif dans `app/` (App Router) : composants partagés dans `app/_components/`, utilitaires dans `app/_lib/`, route API dans `app/api/breakdown/route.ts`, page de partage dans `app/partage/` ; tests dans `tests/`.
 - Composants React : un par fichier, nom en PascalCase, `export default function` ; composants client marqués `"use client"`.
 - Utilitaires : fichiers en camelCase (`contentFilter.ts`, `sharePayload.ts`) avec exports nommés.
 - Imports relatifs (l'alias `@/*` est déclaré dans tsconfig.json mais pas utilisé).
@@ -52,20 +53,35 @@ npm run dev       # serveur de développement
 - Textes de l'interface et messages d'erreur en français ; commentaires de code en anglais.
 - Commits : préfixes Conventional Commits (`feat:`, `fix:`, `chore:`), message en français et en minuscules, souvent avec « — » pour détailler.
 
+## Tests
+- Vitest, environnement `node` ; les tests vivent dans `tests/**/*.test.ts` (`vitest.config.ts`).
+- Tests déterministes, sans réseau : le SDK Anthropic est remplacé par un double
+  (`vi.mock("@anthropic-ai/sdk", …)` vers `tests/helpers/anthropicMock.ts`).
+- Un test par critère d'acceptation ; jamais de test qui fige un bug connu
+  (utiliser `it.todo("#N — titre de l'issue")`, comme dans `tests/ecartsConnus.test.ts`).
+- Test de sabotage obligatoire avant le passage en « Ready ».
+
 ## Définition de « fini »
-- Lint, tests et build passent.
-- Chaque critère d'acceptation de la spec est couvert par un test.
+- `scripts/verify.sh` et le build passent en CI.
+- Chaque critère est couvert par un test ; chaque règle critique est prouvée par sabotage.
 - Aucun changement hors périmètre de la spec.
-- PR relue (revue IA puis validation humaine).
+- Revue IA passée, puis validation et merge humains.
 
 ## Workflow
-1. Une user story = une issue GitHub (gabarit « User story »).
-2. `/factory:spec <n° d'issue>` produit `specs/<ID>-<slug>.md` en `statut: draft`.
-3. L'humain relit et passe la spec à `statut: approved`.
-4. `/factory:implement specs/<ID>-<slug>.md` crée la branche et la PR en brouillon.
-5. Revue IA, puis validation humaine, puis merge.
+1. `/factory:ship start <US-n | issue | texte>` (ou `next` avec un backlog Notion, voir `.factory/backlog.env`)
+   → branche `feat/US-<n>-<slug>`, spec en `draft`, **arrêt**.
+2. Relecture humaine, décisions, `statut: approved`, commit.
+3. `/factory:ship continue` → code (T0 d'abord), porte `scripts/verify.sh`, revue indépendante, PR en brouillon, **arrêt**.
+4. `gh pr ready <n>` par l'humain → une revue IA en CI ; merge humain.
+
+Étape par étape si besoin : `/factory:spec`, `/factory:implement`, `/factory:sabotage`, `/factory:review`.
+
+## Porte qualité
+`scripts/verify.sh` (réglages : `.factory/verify.env`) : spec approuvée, fichiers limités au bloc `scope` de la spec,
+aucun secret ni `.env`, aucun `.only`/`.skip`, `it.todo` seulement avec `#issue`, lint, tests, mutation.
+Elle tourne en CI sur chaque PR. Elle ne vérifie que ce qui est commité. Un agent ne la modifie jamais.
 
 ## Interdits
-- Pas de push sur `main`, pas de force-push.
+- Pas de push sur `main`, pas de force-push, pas de merge ni de « Ready » par un agent.
 - Ne jamais lire ni écrire de secrets (`.env`, clés API).
 - Pas de nouvelle dépendance sans justification dans la PR.
