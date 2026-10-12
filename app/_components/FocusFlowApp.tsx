@@ -55,7 +55,13 @@ function categorizeThought(text: string): string | null {
   return null;
 }
 
-export default function FocusFlowApp() {
+export default function FocusFlowApp({
+  versionLabel,
+  footer,
+}: {
+  versionLabel: string | null;
+  footer: React.ReactNode;
+}) {
   const [task, setTask] = useState("");
   const [mood, setMood] = useState("mid");
   const [loading, setLoading] = useState(false);
@@ -172,7 +178,7 @@ export default function FocusFlowApp() {
       <div className="relative z-10 max-w-[880px] mx-auto px-8 pt-7 pb-[180px] max-[720px]:px-[18px] max-[720px]:pb-[200px]">
         {/* Topbar */}
         <div className="flex items-center justify-between pb-8">
-          <Brand />
+          <Brand versionLabel={versionLabel} />
           <FocusState count={thoughts.length} />
         </div>
 
@@ -233,6 +239,9 @@ export default function FocusFlowApp() {
             <SharePanel task={task} steps={steps} />
           </>
         )}
+
+        {/* Page footer: last child of the content, above the dock reserve */}
+        {footer}
       </div>
 
       <CaptureDock thoughts={thoughts} onAdd={addThought} onTransform={transformThought} />
