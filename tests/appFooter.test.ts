@@ -3,6 +3,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import AppFooter from "../app/_components/AppFooter";
 import Home from "../app/page";
+import SharePage from "../app/partage/page";
 
 // Mutable stand-in for package.json: each test decides whether a version exists.
 const pkg = vi.hoisted(() => ({ version: "9.8.7" } as { version?: string }));
@@ -49,5 +50,13 @@ describe("Pied de page dans les pages", () => {
     expect(footers(html)[0]).toContain("v9.8.7");
     expect(html.indexOf("fixed bottom-0")).toBeGreaterThan(-1);
     expect(html.indexOf("<footer")).toBeLessThan(html.indexOf("fixed bottom-0"));
+  });
+
+  it("C7 — partage : pied de page hors de ShareView", () => {
+    const html = renderToStaticMarkup(createElement(SharePage));
+
+    expect(count(html, "<footer")).toBe(1);
+    expect(footers(html)).toHaveLength(1);
+    expect(footers(html)[0]).toContain("v9.8.7");
   });
 });
