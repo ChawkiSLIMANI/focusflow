@@ -66,6 +66,7 @@ if [[ "$BRANCH" =~ $SPEC_BRANCH_REGEX ]]; then
       while IFS= read -r f; do
         [ -z "$f" ] && continue
         [ "$f" = "$SPEC" ] && continue
+        [ "$f" = "metrics/$ID.yml" ] && continue   # fiche de mesures de la story : autorisée d'office
         printf '%s\n' "$SCOPE" | grep -qxF "$f" || OUT="$OUT $f"
       done <<LIST
 $CHANGED
@@ -73,6 +74,19 @@ $DELETED
 LIST
       if [ -z "$OUT" ]; then pass "chaque fichier modifié figure dans le périmètre de la spec"
       else fail "fichiers hors du périmètre de la spec :$OUT"; fi
+    fi
+    # Fiche de mesures : facultative ; présente, elle doit rester lisible par la rétrospective.
+    METRICS="metrics/$ID.yml"
+    if [ -f "$METRICS" ]; then
+      CAUSES_RE='spec-ambiguë|test-faux|code|environnement|porte|revue|budget|découpage'
+      BAD_CAUSES="$(grep -E '^[[:space:]]*(-[[:space:]]*)?cause:' "$METRICS" \
+        | sed -E 's/^.*cause:[[:space:]]*//; s/[[:space:]]*(#.*)?$//' | tr -d "\"'" \
+        | grep -vxE "$CAUSES_RE" | tr '\n' ' ' || true)"
+      if ! grep -qE "^story:[[:space:]]*[\"']?$ID[\"']?[[:space:]]*$" "$METRICS"; then
+        fail "fiche de mesures : ligne « story: $ID » attendue dans $METRICS"
+      elif [ -n "$BAD_CAUSES" ]; then
+        fail "fiche de mesures : cause hors liste ( $BAD_CAUSES) dans $METRICS"
+      else pass "fiche de mesures lisible : $METRICS"; fi
     fi
   fi
 else

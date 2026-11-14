@@ -1,15 +1,4 @@
 {
-  "extraKnownMarketplaces": {
-    "slimani-factory": {
-      "source": {
-        "source": "github",
-        "repo": "ChawkiSLIMANI/slimani-factory"
-      }
-    }
-  },
-  "enabledPlugins": {
-    "factory@slimani-factory": true
-  },
   "permissions": {
     "allow": [
       "Bash(git status)",
@@ -32,5 +21,14 @@
       "Bash(rm -rf:*)",
       "Bash(git push --force:*)"
     ]
+  },
+  "enabledPlugins": {},
+  "extraKnownMarketplaces": {
+    "slimani-factory": {
+      "source": {
+        "source": "github",
+        "repo": "ChawkiSLIMANI/slimani-factory"
+      }
+    }
   }
 }
