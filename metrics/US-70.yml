@@ -1,0 +1,16 @@
+story: US-70
+titre: "Prévenir avant l'envoi quand la tâche fait moins de 3 caractères"
+mode: enchaîné
+taille: S
+estimation_sans_ia_h: 1.5
+debut: "2026-11-14 23:00"
+etat: en-cours
+pr: null
+phases_min: {cadrage: null, attente_porte1: 0, dev: null, porte_et_revue: null, total: null}
+reel_h: null
+ratio: null
+portes: 0
+corrections: 0
+revues: []
+sabotage: {appliquees: null, detectees: null}
+incidents: []
