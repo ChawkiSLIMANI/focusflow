@@ -13,6 +13,7 @@ import StepList from "./StepList";
 import ProgressStrip from "./ProgressStrip";
 import CaptureDock from "./CaptureDock";
 import SharePanel from "./SharePanel";
+import { isTaskTooShort, TASK_TOO_SHORT_MESSAGE, requestBreakdown } from "../_lib/breakdownRequest";
 
 export type MicroStep = {
   t: string;
@@ -106,26 +107,26 @@ export default function FocusFlowApp({
   const doneCount = Object.values(checked).filter(Boolean).length;
 
   async function submitTask(taskText: string) {
-    if (!taskText.trim() || loading) return;
+    if (loading) return;
+    // The length guard runs before any loading state or network call.
+    if (isTaskTooShort(taskText)) {
+      setTask(taskText);
+      setError(TASK_TOO_SHORT_MESSAGE);
+      return;
+    }
+    if (!taskText.trim()) return;
     setTask(taskText);
     setLoading(true);
     setSteps([]);
     setChecked({});
     setError(null);
     try {
-      const res = await fetch("/api/breakdown", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ task: taskText, mood }),
-      });
-      const data = await res.json();
-      if (!res.ok || data.error) {
-        setError(data.error ?? "Une erreur est survenue.");
-      } else {
-        setSteps(data.steps);
+      const result = await requestBreakdown(taskText, mood);
+      if (result.kind === "error") {
+        setError(result.message);
+      } else if (result.kind === "steps") {
+        setSteps(result.steps);
       }
-    } catch {
-      setError("Impossible de contacter le serveur. Vérifie ta connexion.");
     } finally {
       setLoading(false);
     }

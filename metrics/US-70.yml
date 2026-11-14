@@ -1,0 +1,19 @@
+story: US-70
+titre: "Prévenir avant l'envoi quand la tâche fait moins de 3 caractères"
+mode: enchaîné
+taille: S
+estimation_sans_ia_h: 1.5
+debut: "2026-11-14 23:00"
+etat: pr-ouverte
+pr: 21
+phases_min: {cadrage: 2, attente_porte1: 0, dev: 2, porte_et_revue: 1, total: 6}
+reel_h: 0.1
+ratio: 15
+portes: 1
+corrections: 0
+revues: [APPROUVÉ]
+sabotage: {appliquees: 5, detectees: 5}
+incidents:
+  - phase: ci-1
+    cause: environnement
+    résumé: "build CI en échec au téléchargement de la police Google Inter par Turbopack, sans lien avec le diff (main vert avec les mêmes fichiers, build local vert) ; relance par nouveau push"
