@@ -4,13 +4,13 @@ mode: enchaîné
 taille: S
 estimation_sans_ia_h: 1.5
 debut: "2026-11-14 23:00"
-etat: en-cours
+etat: pr-ouverte
 pr: null
-phases_min: {cadrage: null, attente_porte1: 0, dev: null, porte_et_revue: null, total: null}
-reel_h: null
-ratio: null
-portes: 0
+phases_min: {cadrage: 2, attente_porte1: 0, dev: 2, porte_et_revue: 1, total: 6}
+reel_h: 0.1
+ratio: 15
+portes: 1
 corrections: 0
-revues: []
-sabotage: {appliquees: null, detectees: null}
+revues: [APPROUVÉ]
+sabotage: {appliquees: 5, detectees: 5}
 incidents: []
