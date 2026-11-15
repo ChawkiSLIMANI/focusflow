@@ -40,8 +40,8 @@ npm run lint          # analyse statique (eslint)
 npm test              # tests (vitest run)
 npm run test:watch    # tests en mode watch (vitest)
 ```
-- État vérifié le 2026-10-12 : `npm run lint` passe sans erreur ; `npx vitest run` passe
-  (8 fichiers de tests dont 1 sans test exécuté, 72 tests réussis, 6 `it.todo`, 0 échec).
+- État vérifié le 2026-11-15 : `npm run lint` passe sans erreur ; `npx vitest run` passe
+  (13 fichiers de tests dont 1 sans test exécuté, 105 tests réussis, 5 `it.todo`, 0 échec).
 
 ## Conventions de code
 - Code applicatif dans `app/` (App Router) : composants partagés dans `app/_components/`, utilitaires dans `app/_lib/`, route API dans `app/api/breakdown/route.ts`, page de partage dans `app/partage/` ; tests dans `tests/`.
@@ -65,16 +65,31 @@ npm run test:watch    # tests en mode watch (vitest)
 - `scripts/verify.sh` et le build passent en CI.
 - Chaque critère est couvert par un test ; chaque règle critique est prouvée par sabotage.
 - Aucun changement hors périmètre de la spec.
-- Revue IA passée, puis validation et merge humains.
+- Revue indépendante (`reviewer`) approuvée, puis validation et merge humains
+  (en mode enchaîné : merge squash par l'orchestrateur, une fois les vérifications vertes).
 
 ## Workflow
 1. `/factory:ship start <US-n | issue | texte>` (ou `next` avec un backlog Notion, voir `.factory/backlog.env`)
    → branche `feat/US-<n>-<slug>`, spec en `draft`, **arrêt**.
 2. Relecture humaine, décisions, `statut: approved`, commit.
 3. `/factory:ship continue` → code (T0 d'abord), porte `scripts/verify.sh`, revue indépendante, PR en brouillon, **arrêt**.
-4. `gh pr ready <n>` par l'humain → une revue IA en CI ; merge humain.
+4. Relecture de la PR par l'humain, `gh pr ready <n>` et merge humains.
 
 Étape par étape si besoin : `/factory:spec`, `/factory:implement`, `/factory:sabotage`, `/factory:review`.
+
+**Mode enchaîné** (seulement si l'humain a lancé Claude Code avec `FACTORY_CHAINED=1`) :
+`/factory:chain US-<n> …` livre chaque story Notion « Prête », dans l'ordre donné, jusqu'au merge :
+main à jour → spec technique commentée sur la story (« Prise en charge (mode enchaîné) ») → branche
+`feat/US-<n>-<slug>` → tests couvrant les critères → build et tests verts → revue → PR non brouillon →
+vérifications vertes → `gh pr merge <n> --squash` → commentaire « Livrée : PR #… mergée ».
+Arrêt immédiat, sans merger : échec répété sans cause trouvée, critère ambigu ou contraire à une règle produit,
+merge impossible, solution qui exigerait d'envoyer ou de stocker des données sensibles.
+Même dans ce mode : jamais de push sur `main`, de force-push, de `gh pr ready`, de changement de statut Notion,
+ni de modification de la porte ou d'une CI déjà présente sur `main`.
+
+Mesures : chaque story laisse une fiche `metrics/US-<n>.yml` (durées, incidents classés par cause), écrite par
+l'orchestrateur et autorisée d'office par la porte. Il n'y a pas de revue IA en CI : la revue est celle de
+l'agent `reviewer`, dans la session.
 
 ## Porte qualité
 `scripts/verify.sh` (réglages : `.factory/verify.env`) : spec approuvée, fichiers limités au bloc `scope` de la spec,
@@ -82,6 +97,7 @@ aucun secret ni `.env`, aucun `.only`/`.skip`, `it.todo` seulement avec `#issue`
 Elle tourne en CI sur chaque PR. Elle ne vérifie que ce qui est commité. Un agent ne la modifie jamais.
 
 ## Interdits
-- Pas de push sur `main`, pas de force-push, pas de merge ni de « Ready » par un agent.
+- Pas de push sur `main`, pas de force-push, pas de merge ni de « Ready » par un agent
+  (seule exception : le merge squash encadré du mode enchaîné).
 - Ne jamais lire ni écrire de secrets (`.env`, clés API).
 - Pas de nouvelle dépendance sans justification dans la PR.
