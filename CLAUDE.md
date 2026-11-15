@@ -15,6 +15,9 @@
 ## Stack
 Next.js App Router, React, TypeScript, Tailwind CSS (animations en CSS : animate-step-in), API Claude (`claude-sonnet-4-6`) via app/api/breakdown, hébergement Vercel (DNS chez OVH).
 
+- Polices embarquées dans `app/fonts` (`next/font/local`) : le build et les tests ne téléchargent rien d'autre
+  que les dépendances déclarées (pas de `next/font/google`, pas de ressource récupérée sur le réseau au build).
+
 ## Conventions produit
 - Erreurs : bandeau orange inline sous le bouton, message exact de l'API, ✕ pour fermer, réinitialisé à chaque nouveau submit ; jamais d'échec silencieux (console seule).
 - Design « warm editorial » : titres serif, accent orange, étapes numérotées 01/02/03, barre de progression, dock de capture fixe en bas ; inputs ≥ 16 px (zoom iOS Safari).
